@@ -9,18 +9,18 @@
 <body>
     <form onsubmit="addToLocalStorage(event)">
         <label for="">sellingPrice</label>
-        <input type="text" name="sellingPrice">
+        <input type="text" name="sellingPrice" id="sellingPriceTag">
         <label for="">productName</label>
-        <input type="text" name="productName">
+        <input type="text" name="productName" id="productNameTag">
         <button type="submit">Add Product</button>
-        <ul id="listOfItems">
-
-        </ul>
+        
     </form>
     <h1>Products</h1>
+    <ul id="listOfItems">
 
-    <h3 >Total value worth of product: rs</h3>
-    <p id="sum"></p>
+    </ul>
+
+    <h3 >Total value worth of product: rs <p id="sum">0</p></h3>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         var sum=0;
@@ -33,18 +33,21 @@
                 productName:productName
             }
             localStorage.setItem(productName,sellingPrice);
-            axios.post("https://crudcrud.com/api/cfbacf43f16c427683345935be6dfbd3/productData",obj);
+           axios.post("https://crudcrud.com/api/ce10c128627f4142801ddf07aa3d2be4/productData",obj);
             const rss=document.getElementById("sum");
             sum+=Number(obj.sellingPrice);
             rss.textContent=sum;
-            showTheOutput(obj);
+           showTheOutput(obj);
         }
         window.addEventListener("DOMContentLoaded",()=>{
-            axios.get("https://crudcrud.com/api/cfbacf43f16c427683345935be6dfbd3/productData")
+            axios.get("https://crudcrud.com/api/ce10c128627f4142801ddf07aa3d2be4/productData")
             .then((response)=>{
                 console.log(response);
                 for(var i=0;i<response.data.length;i++){
                     showTheOutput(response.data[i]);
+                    const rss=document.getElementById("sum");
+            sum+=Number(response.data[i].sellingPrice);
+            rss.textContent=sum;
                 }
             })
             .catch((err)=>console.log(err));
@@ -66,8 +69,18 @@
                 const rss=document.getElementById("sum");
                 sum-=Number(obj.sellingPrice);
                 rss.textContent=sum;
-                axios.delete("https://crudcrud.com/api/cfbacf43f16c427683345935be6dfbd3/productData/${obj._id}")
+                axios.delete(`https://crudcrud.com/api/ce10c128627f4142801ddf07aa3d2be4/productData/${obj._id}`)
                 parent.removeChild(child)
+            }
+            editBtn.onclick=()=>{
+                document.getElementById("sellingPriceTag").value=obj.sellingPrice;
+                document.getElementById("productNameTag").value=obj.productName;
+                localStorage.removeItem(obj.productName);
+                axios.delete(`https://crudcrud.com/api/ce10c128627f4142801ddf07aa3d2be4/productData/${obj._id}`);
+                parent.removeChild(child);
+                const rss=document.getElementById("sum");
+                sum-=Number(obj.sellingPrice);
+                rss.textContent=sum;
             }
             child.appendChild(deleteBtn);
             child.appendChild(editBtn);
